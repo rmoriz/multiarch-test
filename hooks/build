@@ -1,0 +1,3 @@
+for arch in aarch64 arm amd64; do
+  docker build --build-arg ARCH=$arch -f $DOCKERFILE_PATH -t $IMAGE_NAME --platform $arch .
+end

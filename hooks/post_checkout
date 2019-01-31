@@ -1,0 +1,9 @@
+#!/bin/bash
+
+apt-get update
+apt-get install -y curl qemu-user-static binfmt-support
+
+
+for arch in aarch64 arm amd64; do
+  cp -p "$(which qemu-${arch}-static)" .
+done
