@@ -1,3 +1,23 @@
-for arch in aarch64 arm amd64; do
-  docker build --build-arg ARCH=$arch -f $DOCKERFILE_PATH -t $IMAGE_NAME --platform $arch .
-end
+#!/bin/bash
+set -eu
+
+echo "🔵 build"
+source hooks/.config
+
+for arch in ${build_architectures[@]}; do
+  echo "✅ building $arch"
+  echo "⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"
+
+  BASE_IMAGE_PREFIX="${base_image_prefix_map[${arch}]}"
+  docker build \
+    --build-arg BASE_IMAGE_PREFIX=${BASE_IMAGE_PREFIX} \
+    --build-arg ARCH=${arch} \
+    --file $DOCKERFILE_PATH \
+    --tag "${DOCKER_REPO}:${CACHE_TAG}-${arch}"  \
+    .
+done
+
+echo "✅ images built:"
+echo "⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"
+
+docker image ls
