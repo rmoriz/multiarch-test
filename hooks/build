@@ -1,10 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -eu
 
 echo "🔵 build"
 source hooks/.config
 
-for arch in ${build_architectures[@]}; do
+echo "✅ Will build the following architectures: $verified_build_architectures"
+echo "⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"
+
+for arch in ${verified_build_architectures[@]}; do
   echo "✅ building $arch"
   echo "⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"
 
@@ -13,7 +16,7 @@ for arch in ${build_architectures[@]}; do
     --build-arg BASE_IMAGE_PREFIX=${BASE_IMAGE_PREFIX} \
     --build-arg ARCH=${arch} \
     --file $DOCKERFILE_PATH \
-    --tag "${DOCKER_REPO}:${CACHE_TAG}-${arch}"  \
+    --tag "${IMAGE_NAME}-${arch}"  \
     .
 done
 
@@ -26,12 +29,12 @@ docker image ls
 tempdir=$(mktemp -d -t yolo.XXXXXXXX)
 cd $tempdir
 
-for arch in ${build_architectures[@]}; do
+for arch in ${verified_build_architectures[@]}; do
   echo "✅ yolo fixing platform $arch"
   echo "⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"
 
   manifest_arch=${docker_to_manifest_map[${arch}]}
-  docker save "${DOCKER_REPO}:${CACHE_TAG}-${arch}" | tar xv
+  docker save "${IMAGE_NAME}-${arch}"| tar xv
 
   for filename in */json; do
     [ -e "$filename" ] || continue
